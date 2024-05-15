@@ -19,7 +19,7 @@ def cluster_image(pic):
         n_clusters=3,
         random_state=42,
         n_init=10,
-        init=[[0, 0, 0], [97.00881952, 72.17407544, 44.85307902], [108.71433554,  60.85790536,  49.73037811]]
+        init=np.array([[0, 0, 0], [97.00881952, 72.17407544, 44.85307902], [108.71433554,  60.85790536,  49.73037811]])
     )
     km.fit(pic2)
     cluster_labels = km.labels_
@@ -43,6 +43,6 @@ def model(img):
     pic = Image.open(BytesIO(img.read()))
     # make np array for calculation
     res = cluster_image(np.array(pic))
-    mdl = joblib.load('votig_clf.pkl')
+    mdl = joblib.load('model.pkl')
     return mdl.predict([res])
 
