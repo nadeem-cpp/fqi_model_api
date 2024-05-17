@@ -4,6 +4,7 @@ from sklearn.cluster import KMeans
 import warnings
 from io import BytesIO
 from PIL import Image
+from rembg import remove
 
 # Filter out specific warnings
 warnings.filterwarnings("ignore", message="Explicit initial center position passed", category=RuntimeWarning)
@@ -14,12 +15,11 @@ warnings.filterwarnings("ignore", category=UserWarning)
 
 def cluster_image(pic):
     pic2 = pic.reshape(-1, 3)
-    # pic2 = np.array(pic2)
     km = KMeans(
         n_clusters=3,
         random_state=42,
         n_init=10,
-        init=np.array([[0, 0, 0], [97.00881952, 72.17407544, 44.85307902], [108.71433554,  60.85790536,  49.73037811]])
+        init=np.array([[0, 0, 0], [97.00881952, 72.17407544, 44.85307902], [108.71433554, 60.85790536, 49.73037811]])
     )
     km.fit(pic2)
     cluster_labels = km.labels_
@@ -38,11 +38,15 @@ def cluster_image(pic):
     ]
 
 
+def preprocess_img(img: Image) -> Image:
+    return remove(img).convert('RGB')
+
+
 def model(img):
     # convert img object to bytesIo --> then open it
     pic = Image.open(BytesIO(img.read()))
-    # make np array for calculation
-    res = cluster_image(np.array(pic))
+    # preprocess image
+    processed_img = preprocess_img(pic)
+    res = cluster_image(np.array(processed_img))
     mdl = joblib.load('model.pkl')
     return mdl.predict([res])
-
